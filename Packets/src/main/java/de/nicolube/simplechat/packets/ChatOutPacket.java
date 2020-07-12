@@ -1,20 +1,19 @@
 package de.nicolube.simplechat.packets;
 
 import io.netty.buffer.ByteBuf;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-public class ChatPacket extends Packet {
+@Data
+@NoArgsConstructor
+public class ChatOutPacket extends Packet {
 
     private String sender;
     private String message;
 
-    public ChatPacket(String sender, String message) {
+    public ChatOutPacket(String sender, String message) {
         this.sender = sender;
         this.message = message;
-    }
-
-    public ChatPacket() {
     }
 
     @Override

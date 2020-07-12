@@ -16,7 +16,8 @@
  */
 package de.nicolube.simplechat.server.handlers;
 
-import de.nicolube.simplechat.packets.ChatPacket;
+import de.nicolube.simplechat.packets.ChatInPacket;
+import de.nicolube.simplechat.packets.LoginPacket;
 import de.nicolube.simplechat.packets.Packet;
 import de.nicolube.simplechat.packets.PingPacket;
 import de.nicolube.simplechat.server.Server;
@@ -46,11 +47,21 @@ public class NetworkHandler extends SimpleChannelInboundHandler<Packet> {
     protected void channelRead0(ChannelHandlerContext ctx, Packet packet) throws Exception {
         if (packet instanceof PingPacket) {
             this.channel.writeAndFlush(packet, ctx.voidPromise());
-            System.out.println("Return ping");
+            return;
         }
-        if (packet instanceof ChatPacket) {
-            this.server.receiveMessage((ChatPacket) packet);
+        if (packet instanceof ChatInPacket) {
+            this.server.receiveMessage(this.server.getUserByChannel(ctx.channel()), (ChatInPacket) packet);
+            return;
+        }
+        if (packet instanceof LoginPacket) {
+            this.server.login(((LoginPacket) packet).getUsername(), ctx.channel());
+            return;
         }
     }
 
+    @Override
+    public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
+        super.channelUnregistered(ctx);
+        this.server.logout(ctx.channel());
+    }
 }

@@ -17,20 +17,21 @@
 package de.nicolube.simplechat.packets;
 
 import io.netty.buffer.ByteBuf;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  *
  * @author nicolue.de
  */
+@Data
+@NoArgsConstructor
 public class PingPacket extends Packet {
 
     private long ping;
 
     public PingPacket(long ping) {
         this.ping = ping;
-    }
-
-    public PingPacket() {
     }
 
     @Override

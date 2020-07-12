@@ -16,10 +16,11 @@
  */
 package de.nicolube.simplechat.client.handlers;
 
-import de.nicolube.simplechat.packets.ChatPacket;
+import de.nicolube.simplechat.client.Client;
+import de.nicolube.simplechat.packets.ChatOutPacket;
 import de.nicolube.simplechat.packets.Packet;
 import de.nicolube.simplechat.packets.PingPacket;
-import de.nicolube.simplechat.client.Client;
+import de.nicolube.simplechat.packets.UserListPacket;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
@@ -39,10 +40,16 @@ public class NetworkHandler extends SimpleChannelInboundHandler<Packet>{
     protected void channelRead0(ChannelHandlerContext ctx, Packet packet) throws Exception {
         if (packet instanceof PingPacket) {
             System.out.println("Ping: "+(((PingPacket) packet).getPing()));
+            return;
         }
-        if (packet instanceof ChatPacket) {
-            ChatPacket chatPacket = (ChatPacket) packet;
-            this.client.receiveMessage(chatPacket.getSender(), chatPacket.getMessage());
+        if (packet instanceof ChatOutPacket) {
+            ChatOutPacket chatOutPacket = (ChatOutPacket) packet;
+            this.client.receiveMessage(chatOutPacket.getSender(), chatOutPacket.getMessage());
+            return;
+        }
+        if (packet instanceof UserListPacket) {
+            this.client.updateUserList(((UserListPacket) packet).getUsers());
+            return;
         }
     }
     

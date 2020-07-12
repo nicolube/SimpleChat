@@ -16,9 +16,12 @@
  */
 package de.nicolube.simplechat.server;
 
-import de.nicolube.simplechat.packets.ChatPacket;
-import de.nicolube.simplechat.packets.PacketDecoder;
-import de.nicolube.simplechat.packets.PacketEncoder;
+import de.nicolube.simplechat.common.PacketDecoder;
+import de.nicolube.simplechat.common.PacketEncoder;
+import de.nicolube.simplechat.common.User;
+import de.nicolube.simplechat.packets.ChatInPacket;
+import de.nicolube.simplechat.packets.ChatOutPacket;
+import de.nicolube.simplechat.packets.UserListPacket;
 import de.nicolube.simplechat.server.handlers.NetworkHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -31,8 +34,9 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 
 import javax.net.ssl.SSLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * @author nicolue.de
@@ -42,11 +46,13 @@ public class Server {
     public static boolean EPPLL = Epoll.isAvailable();
 
     private final Config config;
-    private final List<Channel> channels;
+    private final Map<Channel, User> users;
+    private final LinkedList<CachedMessage> cachedMessages;
 
     public Server() throws InterruptedException, SSLException {
         this.config = new Config();
-        this.channels = new ArrayList<>();
+        this.users = new HashMap();
+        this.cachedMessages = new LinkedList<>();
         Server server = this;
         EventLoopGroup eventLoopGroup = EPPLL ? new EpollEventLoopGroup() : new NioEventLoopGroup();
         SslContext sslContext = SslContextBuilder.forServer(getClass().getResourceAsStream("/csr.pem"), getClass().getResourceAsStream("/privkey.pem")).build();
@@ -62,10 +68,10 @@ public class Server {
                                     .addLast(new PacketEncoder())
                                     .addLast(new PacketDecoder())
                                     .addLast(new NetworkHandler(server));
-                            channels.add(ch);
+                            users.put(ch, new User(ch));
                         }
                     })
-                    .bind(config.getHost(), config.getPort()).sync().channel().closeFuture().addListener((ChannelFutureListener) channels::remove).syncUninterruptibly();
+                    .bind(config.getHost(), config.getPort()).sync().channel().closeFuture().syncUninterruptibly();
         } finally {
             eventLoopGroup.shutdownGracefully();
         }
@@ -76,7 +82,31 @@ public class Server {
 
     }
 
-    public void receiveMessage(ChatPacket packet) {
-        this.channels.forEach(ch -> ch.writeAndFlush(packet));
+    public void receiveMessage(User user, ChatInPacket packet) {
+        String message = packet.getMessage();
+        ChatOutPacket chatOutPacket = new ChatOutPacket(user.getUsername(), message);
+        this.cachedMessages.addLast(new CachedMessage(user, message));
+        this.users.forEach((ch, u) -> u.getChannel().writeAndFlush(chatOutPacket));
     }
+
+    public void login(String user, Channel channel) {
+        getUserByChannel(channel).setUsername(user);
+        this.cachedMessages.forEach((cm) -> channel.writeAndFlush(new ChatOutPacket(cm.getUser().getUsername(), cm.getMessage())));
+        updateUserList();
+    }
+
+    public void logout(Channel channel) {
+        this.users.remove(channel);
+        updateUserList();
+    }
+
+    private void updateUserList() {
+        UserListPacket userListPacket = new UserListPacket(this.users.values().stream().map(User::getUsername).toArray(String[]::new));
+        this.users.values().forEach(u -> u.getChannel().writeAndFlush(userListPacket));
+    }
+
+    public User getUserByChannel(Channel channel) {
+        return this.users.get(channel);
+    }
+
 }

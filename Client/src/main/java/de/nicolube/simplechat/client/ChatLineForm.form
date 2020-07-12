@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="de.nicolube.simplechat.client.MainPanel.ChatMessagePanel">
+  <grid id="27dc6" binding="messagePanel" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+    <margin top="1" left="1" bottom="1" right="1"/>
+    <constraints>
+      <xy x="20" y="20" width="500" height="56"/>
+    </constraints>
+    <properties/>
+    <border type="line" title-position="2"/>
+    <children>
+      <component id="e5229" class="javax.swing.JLabel" binding="usernameLabel">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font style="1"/>
+          <text value="Username"/>
+        </properties>
+      </component>
+      <component id="9f11f" class="javax.swing.JTextArea" binding="messageTextArea">
+        <constraints>
+          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="1" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <wrapStyleWord value="true"/>
+        </properties>
+      </component>
+    </children>
+  </grid>
+</form>

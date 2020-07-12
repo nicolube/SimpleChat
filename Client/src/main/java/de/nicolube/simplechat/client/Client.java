@@ -16,14 +16,14 @@
  */
 package de.nicolube.simplechat.client;
 
-import de.nicolube.simplechat.packets.ChatPacket;
 import de.nicolube.simplechat.client.handlers.NetworkHandler;
-import de.nicolube.simplechat.packets.PacketDecoder;
-import de.nicolube.simplechat.packets.PacketEncoder;
+import de.nicolube.simplechat.common.PacketDecoder;
+import de.nicolube.simplechat.common.PacketEncoder;
+import de.nicolube.simplechat.packets.ChatInPacket;
+import de.nicolube.simplechat.packets.LoginPacket;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.EventLoopGroup;
 import io.netty.channel.MultithreadEventLoopGroup;
 import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
@@ -35,7 +35,6 @@ import io.netty.handler.ssl.SslContextBuilder;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
-import javax.swing.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -56,12 +55,14 @@ public class Client {
         this.config = new Config();
         this.mainFrame = new MainFrame(this);
         this.eventLoopGroup = EPPLL ? new EpollEventLoopGroup() : new NioEventLoopGroup();
-        Runtime.getRuntime().addShutdownHook(new Thread(){
+        Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
-            public void run()
-            {
+            public void run() {
+                System.out.println("Shoutdown s");
+                channel.disconnect();
                 channel.close();
                 eventLoopGroup.shutdownGracefully();
+                System.out.println("Shoutdown");
             }
         });
     }
@@ -72,13 +73,20 @@ public class Client {
     }
 
     public void sendMessage(String message) {
-        ChatPacket chatPacket = new ChatPacket(this.user, message);
-        this.channel.pipeline().writeAndFlush(chatPacket);
+        ChatInPacket chatInPacket = new ChatInPacket(message);
+        this.channel.pipeline().writeAndFlush(chatInPacket);
     }
 
     public void receiveMessage(String sender, String message) {
-        JTextPane chatPane = this.mainFrame.getMainPanel().getChatPane();
-        chatPane.setText(chatPane.getText() + "\n" + sender + ": " + message);
+        this.mainFrame.getMainPanel().addMessage(sender, message);
+    }
+
+    public void updateUserList(String[] userList) {
+        StringBuilder sb = new StringBuilder();
+        for (String user : userList) {
+            sb.append(user).append("\n");
+        }
+        getMainFrame().getMainPanel().getUserListPane().setText(sb.toString());
     }
 
     @SneakyThrows
@@ -103,6 +111,7 @@ public class Client {
                             }
                         })
                         .connect(config.getHost(), config.getPort()).sync().channel();
+                this.channel.writeAndFlush(new LoginPacket(user));
                 this.channel.closeFuture().syncUninterruptibly();
             } catch (InterruptedException e) {
                 e.printStackTrace();

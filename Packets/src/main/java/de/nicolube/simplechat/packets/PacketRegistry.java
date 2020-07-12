@@ -16,9 +16,6 @@
  */
 package de.nicolube.simplechat.packets;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  *
  * @author nicolue.de
@@ -26,8 +23,10 @@ import java.util.logging.Logger;
 public enum PacketRegistry {
 
     PING(PingPacket.class),
-    TimePacket(TimePacket.class),
-    ChatPacket(ChatPacket.class);
+    CHAT_OUT_PACKET(ChatOutPacket.class),
+    CHAT_IN_PACKET(ChatInPacket.class),
+    LOGIN_PACKET(LoginPacket.class),
+    USER_LIST_PACKET(UserListPacket.class);
 
     private final Class<? extends Packet> packetClass;
 

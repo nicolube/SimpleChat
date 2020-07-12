@@ -3,30 +3,48 @@ package de.nicolube.simplechat.client;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
+import com.intellij.uiDesigner.core.Spacer;
 import lombok.Getter;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 @Getter
 public class MainPanel {
+    private final JPanel chatListPanel;
     private JPanel mainPanel;
     private JButton sendButton;
     private JTextField chatField;
-    private JTextPane chatPane;
+    private JTextPane userListPane;
+    private JPanel chatContainerPanel;
     private final Client client;
+    private int row = 0;
 
     public MainPanel(Client client) {
         this.client = client;
+        this.chatListPanel = new JPanel();
+        this.chatListPanel.setLayout(new BoxLayout(this.chatListPanel, BoxLayout.Y_AXIS));
+        this.chatContainerPanel.add(chatListPanel);
+
         this.sendButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if (chatField.getText().isEmpty()) return;
                 client.sendMessage(chatField.getText());
                 chatField.setText("");
             }
         });
+    }
+
+
+    public void addMessage(String username, String message) {
+        JPanel messagePanel = new ChatMessagePanel(username, message).getMessagePanel();
+        this.chatListPanel.add(messagePanel);
+        this.chatListPanel.revalidate();
+        this.chatListPanel.updateUI();
     }
 
     {
@@ -45,17 +63,29 @@ public class MainPanel {
      */
     private void $$$setupUI$$$() {
         mainPanel = new JPanel();
-        mainPanel.setLayout(new GridLayoutManager(2, 2, new Insets(30, 30, 30, 30), -1, -1));
+        mainPanel.setLayout(new GridLayoutManager(2, 4, new Insets(30, 30, 30, 30), -1, -1));
         final JScrollPane scrollPane1 = new JScrollPane();
-        mainPanel.add(scrollPane1, new GridConstraints(0, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
-        chatPane = new JTextPane();
-        chatPane.setText("");
-        scrollPane1.setViewportView(chatPane);
+        scrollPane1.setHorizontalScrollBarPolicy(31);
+        mainPanel.add(scrollPane1, new GridConstraints(0, 2, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        final JPanel panel1 = new JPanel();
+        panel1.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        scrollPane1.setViewportView(panel1);
+        chatContainerPanel = new JPanel();
+        chatContainerPanel.setLayout(new BorderLayout(0, 0));
+        panel1.add(chatContainerPanel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         chatField = new JTextField();
-        mainPanel.add(chatField, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        mainPanel.add(chatField, new GridConstraints(1, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         sendButton = new JButton();
         sendButton.setText("Send");
-        mainPanel.add(sendButton, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        mainPanel.add(sendButton, new GridConstraints(1, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final JScrollPane scrollPane2 = new JScrollPane();
+        scrollPane2.setVerticalScrollBarPolicy(21);
+        mainPanel.add(scrollPane2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, new Dimension(200, -1), 0, false));
+        userListPane = new JTextPane();
+        userListPane.setEditable(false);
+        scrollPane2.setViewportView(userListPane);
+        final Spacer spacer1 = new Spacer();
+        mainPanel.add(spacer1, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
     }
 
     /**
@@ -65,4 +95,71 @@ public class MainPanel {
         return mainPanel;
     }
 
+
+    private static class ChatMessagePanel {
+        private JLabel usernameLabel;
+        private JTextArea messageTextArea;
+        @Getter
+        private JPanel messagePanel;
+
+        public ChatMessagePanel(String username, String message) {
+            this.usernameLabel.setText(username + ": ");
+            this.messageTextArea.setText(message);
+        }
+
+        {
+// GUI initializer generated by IntelliJ IDEA GUI Designer
+// >>> IMPORTANT!! <<<
+// DO NOT EDIT OR ADD ANY CODE HERE!
+            $$$setupUI$$$();
+        }
+
+        /**
+         * Method generated by IntelliJ IDEA GUI Designer
+         * >>> IMPORTANT!! <<<
+         * DO NOT edit this method OR call it in your code!
+         *
+         * @noinspection ALL
+         */
+        private void $$$setupUI$$$() {
+            messagePanel = new JPanel();
+            messagePanel.setLayout(new GridLayoutManager(1, 2, new Insets(1, 1, 1, 1), -1, -1));
+            messagePanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.TOP, null, null));
+            usernameLabel = new JLabel();
+            Font usernameLabelFont = this.$$$getFont$$$(null, Font.BOLD, -1, usernameLabel.getFont());
+            if (usernameLabelFont != null) usernameLabel.setFont(usernameLabelFont);
+            usernameLabel.setText("Username");
+            messagePanel.add(usernameLabel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+            messageTextArea = new JTextArea();
+            messageTextArea.setWrapStyleWord(true);
+            messagePanel.add(messageTextArea, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        }
+
+        /**
+         * @noinspection ALL
+         */
+        private Font $$$getFont$$$(String fontName, int style, int size, Font currentFont) {
+            if (currentFont == null) return null;
+            String resultName;
+            if (fontName == null) {
+                resultName = currentFont.getName();
+            } else {
+                Font testFont = new Font(fontName, Font.PLAIN, 10);
+                if (testFont.canDisplay('a') && testFont.canDisplay('1')) {
+                    resultName = fontName;
+                } else {
+                    resultName = currentFont.getName();
+                }
+            }
+            return new Font(resultName, style >= 0 ? style : currentFont.getStyle(), size >= 0 ? size : currentFont.getSize());
+        }
+
+        /**
+         * @noinspection ALL
+         */
+        public JComponent $$$getRootComponent$$$() {
+            return messagePanel;
+        }
+
+    }
 }

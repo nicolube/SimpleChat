@@ -14,13 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.nicolube.simplechat.packets;
+package de.nicolube.simplechat.common;
 
 import de.nicolube.simplechat.packets.Packet;
 import de.nicolube.simplechat.packets.PacketRegistry;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+
 import java.util.List;
 
 /**
@@ -32,6 +33,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) throws Exception {
         int id = byteBuf.readInt();
+        System.out.println("RecID: "+id);
         Packet packet = PacketRegistry.values()[id].getPacketClass().newInstance();
         packet.read(byteBuf);
         out.add(packet);
