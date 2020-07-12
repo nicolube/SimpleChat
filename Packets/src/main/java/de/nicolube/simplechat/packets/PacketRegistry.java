@@ -23,10 +23,12 @@ package de.nicolube.simplechat.packets;
 public enum PacketRegistry {
 
     PING(PingPacket.class),
-    CHAT_OUT_PACKET(ChatOutPacket.class),
-    CHAT_IN_PACKET(ChatInPacket.class),
-    LOGIN_PACKET(LoginPacket.class),
-    USER_LIST_PACKET(UserListPacket.class);
+    CHAT_OUT(PacketOutChat.class),
+    CHAT_INT(PacketInChat.class),
+    LOGIN_IN(PacketInLogin.class),
+    LOGIN_OUT(PacketOutLogin.class),
+    USER_LIST_OUT(PacketOutUserList.class),
+    CACHED_CHAT_OUT(PacketOutCachedChat.class);
 
     private final Class<? extends Packet> packetClass;
 

@@ -1,43 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="de.nicolube.simplechat.client.MainPanel">
-  <grid id="27dc6" binding="mainPanel" layout-manager="GridLayoutManager" row-count="2" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-    <margin top="30" left="30" bottom="30" right="30"/>
+  <grid id="27dc6" binding="mainPanel" layout-manager="GridLayoutManager" row-count="3" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+    <margin top="10" left="10" bottom="10" right="10"/>
     <constraints>
       <xy x="20" y="20" width="500" height="400"/>
     </constraints>
     <properties/>
     <border type="none"/>
     <children>
-      <scrollpane id="2c941">
-        <constraints>
-          <grid row="0" column="2" row-span="1" col-span="2" vsize-policy="7" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <horizontalScrollBarPolicy value="31"/>
-        </properties>
-        <border type="none"/>
-        <children>
-          <grid id="3bfb1" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-            <margin top="0" left="0" bottom="0" right="0"/>
-            <constraints/>
-            <properties/>
-            <border type="none"/>
-            <children>
-              <grid id="123a6" binding="chatContainerPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
-                <constraints>
-                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="1" fill="1" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties/>
-                <border type="none"/>
-                <children/>
-              </grid>
-            </children>
-          </grid>
-        </children>
-      </scrollpane>
       <component id="1018" class="javax.swing.JTextField" binding="chatField">
         <constraints>
-          <grid row="1" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>
           </grid>
         </constraints>
@@ -45,38 +18,109 @@
       </component>
       <component id="6972d" class="javax.swing.JButton" binding="sendButton" default-binding="true">
         <constraints>
-          <grid row="1" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <text value="Send"/>
         </properties>
       </component>
-      <scrollpane id="e68f9">
+      <grid id="f7f8a" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
-          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
-            <maximum-size width="200" height="-1"/>
+          <grid row="1" column="0" row-span="1" col-span="3" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <scrollpane id="e68f9">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                <minimum-size width="100" height="-1"/>
+              </grid>
+            </constraints>
+            <properties>
+              <verticalScrollBarPolicy value="21"/>
+            </properties>
+            <border type="none">
+              <title-color color="-4473925"/>
+            </border>
+            <children>
+              <component id="e784b" class="javax.swing.JTextPane" binding="userListPane">
+                <constraints/>
+                <properties>
+                  <editable value="false"/>
+                  <text value=""/>
+                </properties>
+              </component>
+            </children>
+          </scrollpane>
+          <scrollpane id="2c941" binding="chatScrollPane">
+            <constraints>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <horizontalScrollBarPolicy value="31"/>
+            </properties>
+            <border type="none"/>
+            <children>
+              <grid id="3bfb1" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                <margin top="0" left="0" bottom="0" right="0"/>
+                <constraints/>
+                <properties/>
+                <border type="none">
+                  <color color="-4521216"/>
+                </border>
+                <children>
+                  <grid id="123a6" binding="chatContainerPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="1" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties/>
+                    <border type="none"/>
+                    <children/>
+                  </grid>
+                </children>
+              </grid>
+            </children>
+          </scrollpane>
+        </children>
+      </grid>
+      <toolbar id="948e2">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="-1" height="20"/>
           </grid>
         </constraints>
-        <properties>
-          <verticalScrollBarPolicy value="21"/>
-        </properties>
-        <border type="none">
-          <title-color color="-4473925"/>
-        </border>
+        <properties/>
+        <border type="none"/>
         <children>
-          <component id="e784b" class="javax.swing.JTextPane" binding="userListPane">
+          <component id="5faa8" class="javax.swing.JCheckBox" binding="autoscorllCheckBox" default-binding="true">
             <constraints/>
             <properties>
-              <editable value="false"/>
+              <selected value="true"/>
+              <text value="autoscorll"/>
+            </properties>
+          </component>
+          <component id="bdfc5" class="javax.swing.JCheckBox" binding="notificationCheckBox">
+            <constraints/>
+            <properties>
+              <selected value="true"/>
+              <text value="notification"/>
+            </properties>
+          </component>
+          <hspacer id="d18c8">
+            <constraints/>
+          </hspacer>
+          <component id="fa172" class="javax.swing.JButton" binding="logoutButton" default-binding="true">
+            <constraints/>
+            <properties>
+              <horizontalAlignment value="0"/>
+              <horizontalTextPosition value="11"/>
+              <text value="Logout"/>
             </properties>
           </component>
         </children>
-      </scrollpane>
-      <vspacer id="65c84">
-        <constraints>
-          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
-        </constraints>
-      </vspacer>
+      </toolbar>
     </children>
   </grid>
 </form>

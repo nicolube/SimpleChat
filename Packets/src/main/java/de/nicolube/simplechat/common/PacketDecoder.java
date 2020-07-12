@@ -33,7 +33,6 @@ public class PacketDecoder extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) throws Exception {
         int id = byteBuf.readInt();
-        System.out.println("RecID: "+id);
         Packet packet = PacketRegistry.values()[id].getPacketClass().newInstance();
         packet.read(byteBuf);
         out.add(packet);

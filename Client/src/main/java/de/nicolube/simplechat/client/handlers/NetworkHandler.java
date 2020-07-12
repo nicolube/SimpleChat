@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 nicolube
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,18 +17,18 @@
 package de.nicolube.simplechat.client.handlers;
 
 import de.nicolube.simplechat.client.Client;
-import de.nicolube.simplechat.packets.ChatOutPacket;
-import de.nicolube.simplechat.packets.Packet;
-import de.nicolube.simplechat.packets.PingPacket;
-import de.nicolube.simplechat.packets.UserListPacket;
+import de.nicolube.simplechat.common.CachedMessage;
+import de.nicolube.simplechat.common.User;
+import de.nicolube.simplechat.packets.*;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
+import java.util.LinkedList;
+
 /**
- *
  * @author nicolue.de
  */
-public class NetworkHandler extends SimpleChannelInboundHandler<Packet>{
+public class NetworkHandler extends SimpleChannelInboundHandler<Packet> {
 
     private final Client client;
 
@@ -38,19 +38,30 @@ public class NetworkHandler extends SimpleChannelInboundHandler<Packet>{
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Packet packet) throws Exception {
+        System.out.println("Receive " + packet.getClass().getSimpleName());
         if (packet instanceof PingPacket) {
-            System.out.println("Ping: "+(((PingPacket) packet).getPing()));
+            System.out.println("Ping: " + (((PingPacket) packet).getPing()));
             return;
         }
-        if (packet instanceof ChatOutPacket) {
-            ChatOutPacket chatOutPacket = (ChatOutPacket) packet;
-            this.client.receiveMessage(chatOutPacket.getSender(), chatOutPacket.getMessage());
+        if (packet instanceof PacketOutChat) {
+            PacketOutChat packetOutChat = (PacketOutChat) packet;
+            this.client.receiveMessage(packetOutChat.getSender(), packetOutChat.getMessage());
             return;
         }
-        if (packet instanceof UserListPacket) {
-            this.client.updateUserList(((UserListPacket) packet).getUsers());
+        if (packet instanceof PacketOutUserList) {
+            this.client.updateUserList(((PacketOutUserList) packet).getUsers());
+            return;
+        }
+        if (packet instanceof PacketOutLogin) {
+            User user = ((PacketOutLogin) packet).getUser();
+            user.setChannel(ctx.channel());
+            this.client.login(user);
+            return;
+        }
+        if (packet instanceof PacketOutCachedChat) {
+            LinkedList<CachedMessage> messages = ((PacketOutCachedChat) packet).getMessages();
+            this.client.receiveCachedChat(messages);
             return;
         }
     }
-    
 }

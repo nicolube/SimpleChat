@@ -3,7 +3,7 @@
   <parent>
     <artifactId>SimpleChat</artifactId>
     <groupId>de.nicolube.simplechat</groupId>
-    <version>pre-alpha-0.0.1</version>
+    <version>pre-alpha-0.0.2</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>Packets</artifactId>
@@ -41,7 +41,7 @@
     </dependency>
   </dependencies>
   <properties>
-    <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
   </properties>
 </project>

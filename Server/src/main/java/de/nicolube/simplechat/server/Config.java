@@ -26,7 +26,7 @@ public class Config {
     private int port;
 
     public Config() {
-        this.host = "simplechat.lube.app";
+        this.host = "sctest.lube.app";
         this.port = 56870;
     }
 

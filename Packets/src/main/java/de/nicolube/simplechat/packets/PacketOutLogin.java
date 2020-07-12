@@ -1,17 +1,18 @@
 package de.nicolube.simplechat.packets;
 
+import de.nicolube.simplechat.common.User;
 import io.netty.buffer.ByteBuf;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class UserListPacket extends Packet {
+public class PacketOutLogin extends Packet {
 
-    private String[] users;
+    private User user;
 
-    public UserListPacket(String[] users) {
-        this.users = users;
+    public PacketOutLogin(User user) {
+        this.user = user;
     }
 
     @Override

@@ -17,10 +17,12 @@
 package de.nicolube.simplechat.client;
 
 import de.nicolube.simplechat.client.handlers.NetworkHandler;
+import de.nicolube.simplechat.common.CachedMessage;
 import de.nicolube.simplechat.common.PacketDecoder;
 import de.nicolube.simplechat.common.PacketEncoder;
-import de.nicolube.simplechat.packets.ChatInPacket;
-import de.nicolube.simplechat.packets.LoginPacket;
+import de.nicolube.simplechat.common.User;
+import de.nicolube.simplechat.packets.PacketInChat;
+import de.nicolube.simplechat.packets.PacketInLogin;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -35,6 +37,7 @@ import io.netty.handler.ssl.SslContextBuilder;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
+import java.util.LinkedList;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -47,53 +50,25 @@ public class Client {
     private final Config config;
     @Getter
     private final MainFrame mainFrame;
-    private final MultithreadEventLoopGroup eventLoopGroup;
+    private MultithreadEventLoopGroup eventLoopGroup;
     private Channel channel;
-    private String user;
+    private User user;
 
     public Client() {
         this.config = new Config();
         this.mainFrame = new MainFrame(this);
-        this.eventLoopGroup = EPPLL ? new EpollEventLoopGroup() : new NioEventLoopGroup();
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                System.out.println("Shoutdown s");
-                channel.disconnect();
-                channel.close();
-                eventLoopGroup.shutdownGracefully();
-                System.out.println("Shoutdown");
-            }
-        });
-    }
+        this.mainFrame.loginPanel();
+        ResourceLoader resourceLoader = new ResourceLoader(this.mainFrame.getLoginPanel().getLoadingBar());
+        resourceLoader.add(() -> Sounds.cacheAudio("/sounds/notification.wav"));
+        resourceLoader.run().thenRun(() -> this.mainFrame.getLoginPanel().getLoginButton().setEnabled(true));
+        Runtime.getRuntime().addShutdownHook(new Thread(this::logout));
 
-    public static void main(String[] args) {
-        new Client();
-
-    }
-
-    public void sendMessage(String message) {
-        ChatInPacket chatInPacket = new ChatInPacket(message);
-        this.channel.pipeline().writeAndFlush(chatInPacket);
-    }
-
-    public void receiveMessage(String sender, String message) {
-        this.mainFrame.getMainPanel().addMessage(sender, message);
-    }
-
-    public void updateUserList(String[] userList) {
-        StringBuilder sb = new StringBuilder();
-        for (String user : userList) {
-            sb.append(user).append("\n");
-        }
-        getMainFrame().getMainPanel().getUserListPane().setText(sb.toString());
     }
 
     @SneakyThrows
-    public void login(String user) {
-        this.user = user;
-        this.mainFrame.main();
+    public void initChannel() {
         Client client = this;
+        this.eventLoopGroup = EPPLL ? new EpollEventLoopGroup() : new NioEventLoopGroup();
         SslContext sslContext = SslContextBuilder.forClient().trustManager(getClass().getResourceAsStream("/csr.pem")).build();
         CompletableFuture.runAsync(() -> {
             try {
@@ -111,7 +86,6 @@ public class Client {
                             }
                         })
                         .connect(config.getHost(), config.getPort()).sync().channel();
-                this.channel.writeAndFlush(new LoginPacket(user));
                 this.channel.closeFuture().syncUninterruptibly();
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -120,4 +94,56 @@ public class Client {
             }
         });
     }
+
+    public static void main(String[] args) {
+        new Client();
+    }
+
+    public void sendMessage(String message) {
+        PacketInChat packetInChat = new PacketInChat(message);
+        this.channel.pipeline().writeAndFlush(packetInChat);
+    }
+
+    public void receiveMessage(User sender, String message) {
+        ReceiveType type = ReceiveType.OTHER;
+        if (this.user.getUuid().equals(sender.getUuid())) type = ReceiveType.SELF;
+        this.mainFrame.getMainPanel().addMessage(sender, message, type);
+    }
+
+    public void receiveCachedChat(LinkedList<CachedMessage> messages) {
+        for (CachedMessage cm : messages) {
+            User sender = cm.getUser();
+            ReceiveType type = ReceiveType.OTHER;
+            if (this.user.getUuid().equals(sender.getUuid())) type = ReceiveType.SELF;
+            this.mainFrame.getMainPanel().addMessage(cm, type);
+        }
+    }
+
+    public void updateUserList(String[] userList) {
+        StringBuilder sb = new StringBuilder();
+        for (String user : userList) {
+            sb.append(user).append("\n");
+        }
+        getMainFrame().getMainPanel().getUserListPane().setText(sb.toString());
+    }
+
+    public void prepareLogin(String username) {
+        this.channel.writeAndFlush(new PacketInLogin(username));
+    }
+
+    public void login(User user) {
+        System.out.println("login");
+        this.mainFrame.mainPanel();
+        this.user = user;
+    }
+
+    public void logout() {
+        if (this.channel.isOpen()) {
+            System.out.println("logout");
+            this.channel.disconnect();
+            this.channel.close();
+            this.eventLoopGroup.shutdownGracefully();
+        }
+    }
+
 }

@@ -4,7 +4,7 @@
     <parent>
         <groupId>de.nicolube.simplechat</groupId>
         <artifactId>SimpleChat</artifactId>
-        <version>pre-alpha-0.0.1</version>
+        <version>pre-alpha-0.0.2</version>
     </parent>
     <artifactId>Client</artifactId>
     <packaging>jar</packaging>
@@ -34,13 +34,25 @@
         <dependency>
             <groupId>de.nicolube.simplechat</groupId>
             <artifactId>Packets</artifactId>
-            <version>pre-alpha-0.0.1</version>
+            <version>pre-alpha-0.0.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.intellij</groupId>
             <artifactId>forms_rt</artifactId>
             <version>7.0.3</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.swinglabs.swingx</groupId>
+            <artifactId>swingx-all</artifactId>
+            <version>1.6.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.formdev</groupId>
+            <artifactId>flatlaf</artifactId>
+            <version>0.37</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

@@ -16,15 +16,16 @@
  */
 package de.nicolube.simplechat.server;
 
+import de.nicolube.simplechat.common.CachedMessage;
 import de.nicolube.simplechat.common.PacketDecoder;
 import de.nicolube.simplechat.common.PacketEncoder;
 import de.nicolube.simplechat.common.User;
-import de.nicolube.simplechat.packets.ChatInPacket;
-import de.nicolube.simplechat.packets.ChatOutPacket;
-import de.nicolube.simplechat.packets.UserListPacket;
+import de.nicolube.simplechat.packets.*;
 import de.nicolube.simplechat.server.handlers.NetworkHandler;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
@@ -37,6 +38,7 @@ import javax.net.ssl.SSLException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author nicolue.de
@@ -68,7 +70,6 @@ public class Server {
                                     .addLast(new PacketEncoder())
                                     .addLast(new PacketDecoder())
                                     .addLast(new NetworkHandler(server));
-                            users.put(ch, new User(ch));
                         }
                     })
                     .bind(config.getHost(), config.getPort()).sync().channel().closeFuture().syncUninterruptibly();
@@ -82,17 +83,19 @@ public class Server {
 
     }
 
-    public void receiveMessage(User user, ChatInPacket packet) {
+    public void receiveMessage(User user, PacketInChat packet) {
         String message = packet.getMessage();
-        ChatOutPacket chatOutPacket = new ChatOutPacket(user.getUsername(), message);
+        PacketOutChat packetOutChat = new PacketOutChat(user, message);
         this.cachedMessages.addLast(new CachedMessage(user, message));
-        this.users.forEach((ch, u) -> u.getChannel().writeAndFlush(chatOutPacket));
+        this.users.forEach((ch, u) -> u.getChannel().writeAndFlush(packetOutChat));
     }
 
-    public void login(String user, Channel channel) {
-        getUserByChannel(channel).setUsername(user);
-        this.cachedMessages.forEach((cm) -> channel.writeAndFlush(new ChatOutPacket(cm.getUser().getUsername(), cm.getMessage())));
+    public void login(String username, Channel channel) {
+        User user = new User(username, UUID.randomUUID(), channel);
+        this.users.put(channel, user);
+        channel.writeAndFlush(new PacketOutLogin(user));
         updateUserList();
+        channel.writeAndFlush(new PacketOutCachedChat(this.cachedMessages));
     }
 
     public void logout(Channel channel) {
@@ -101,8 +104,8 @@ public class Server {
     }
 
     private void updateUserList() {
-        UserListPacket userListPacket = new UserListPacket(this.users.values().stream().map(User::getUsername).toArray(String[]::new));
-        this.users.values().forEach(u -> u.getChannel().writeAndFlush(userListPacket));
+        PacketOutUserList packetOutUserList = new PacketOutUserList(this.users.values().stream().map(User::getUsername).toArray(String[]::new));
+        this.users.values().forEach(u -> u.getChannel().writeAndFlush(packetOutUserList));
     }
 
     public User getUserByChannel(Channel channel) {

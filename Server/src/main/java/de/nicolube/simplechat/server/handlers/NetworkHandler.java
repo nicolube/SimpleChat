@@ -16,9 +16,9 @@
  */
 package de.nicolube.simplechat.server.handlers;
 
-import de.nicolube.simplechat.packets.ChatInPacket;
-import de.nicolube.simplechat.packets.LoginPacket;
 import de.nicolube.simplechat.packets.Packet;
+import de.nicolube.simplechat.packets.PacketInChat;
+import de.nicolube.simplechat.packets.PacketInLogin;
 import de.nicolube.simplechat.packets.PingPacket;
 import de.nicolube.simplechat.server.Server;
 import io.netty.channel.Channel;
@@ -49,12 +49,12 @@ public class NetworkHandler extends SimpleChannelInboundHandler<Packet> {
             this.channel.writeAndFlush(packet, ctx.voidPromise());
             return;
         }
-        if (packet instanceof ChatInPacket) {
-            this.server.receiveMessage(this.server.getUserByChannel(ctx.channel()), (ChatInPacket) packet);
+        if (packet instanceof PacketInChat) {
+            this.server.receiveMessage(this.server.getUserByChannel(ctx.channel()), (PacketInChat) packet);
             return;
         }
-        if (packet instanceof LoginPacket) {
-            this.server.login(((LoginPacket) packet).getUsername(), ctx.channel());
+        if (packet instanceof PacketInLogin) {
+            this.server.login(((PacketInLogin) packet).getUsername(), ctx.channel());
             return;
         }
     }

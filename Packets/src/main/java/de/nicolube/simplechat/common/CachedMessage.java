@@ -1,10 +1,11 @@
-package de.nicolube.simplechat.server;
+package de.nicolube.simplechat.common;
 
-import de.nicolube.simplechat.common.User;
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class CachedMessage {
+public class CachedMessage implements Serializable {
     private User user;
     private String message;
 

@@ -6,13 +6,14 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class LoginPacket extends Packet {
+public class PacketInChat extends Packet {
 
-    private String username;
+    private String message;
 
-    public LoginPacket(String username) {
-        this.username = username;
+    public PacketInChat(String message) {
+        this.message = message;
     }
+
     @Override
     public void read(ByteBuf byteBuf) {
         autoRead(this, byteBuf);
