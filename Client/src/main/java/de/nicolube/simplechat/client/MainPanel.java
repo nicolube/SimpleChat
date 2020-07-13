@@ -77,7 +77,7 @@ public class MainPanel {
     private void postAddMessage(ChatMessagePanel panel) {
         this.chatListPanel.add(panel.getMessagePanel());
         this.client.getMainFrame().revalidate();
-        if (!this.autoscorllCheckBox.isSelected()) {
+        if (this.autoscorllCheckBox.isSelected()) {
             JScrollBar vertical = this.chatScrollPane.getVerticalScrollBar();
             vertical.setValue(vertical.getMaximum());
         }
@@ -92,7 +92,7 @@ public class MainPanel {
             case PRIVATE:
                 return new Color(0, 117, 127);
             default:
-                return fallback == null ? new Color(0,0,0) : fallback;
+                return fallback == null ? new Color(0, 0, 0) : fallback;
         }
     }
 
@@ -173,7 +173,7 @@ public class MainPanel {
 
         public ChatMessagePanel(User sender, String message) {
             this.usernameLabel.setText(sender.getUsername() + ": ");
-            this.usernameLabel.setToolTipText(sender.getUsername()+"<"+sender.getUuid().toString()+">");
+            this.usernameLabel.setToolTipText(sender.getUsername() + "<" + sender.getUuid().toString() + ">");
             this.messageTextArea.setText(message);
             this.messageTextArea.setLineWrap(true);
             this.messageTextArea.setWrapStyleWord(true);
@@ -210,6 +210,7 @@ public class MainPanel {
             usernameLabel.setText("Username");
             messagePanel.add(usernameLabel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
             messageTextArea = new JTextArea();
+            messageTextArea.setEditable(false);
             messageTextArea.setWrapStyleWord(true);
             messagePanel.add(messageTextArea, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, new Dimension(100, -1), new Dimension(100, 0), null, 0, false));
         }

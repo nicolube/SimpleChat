@@ -2,10 +2,7 @@ package de.nicolube.simplechat.client;
 
 import lombok.SneakyThrows;
 
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.FloatControl;
+import javax.sound.sampled.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,8 +24,8 @@ public class Sounds {
     @SneakyThrows
     public static Clip cacheAudio(String path) {
         AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(Sounds.class.getResource(path));
-        Clip clip = AudioSystem.getClip();
-        clip.open(audioInputStream);
+        DataLine.Info info = new DataLine.Info(Clip.class, audioInputStream.getFormat());
+        Clip clip = (Clip) AudioSystem.getLine(info);
         Sounds.audioClips.put(path, clip);
         return clip;
     }

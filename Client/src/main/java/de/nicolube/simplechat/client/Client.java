@@ -87,7 +87,7 @@ public class Client {
                         })
                         .connect(config.getHost(), config.getPort()).sync().channel();
                 this.channel.closeFuture().syncUninterruptibly();
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             } finally {
                 eventLoopGroup.shutdownGracefully();

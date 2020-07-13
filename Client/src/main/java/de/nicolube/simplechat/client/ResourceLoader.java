@@ -24,8 +24,12 @@ public class ResourceLoader {
         this.processBar.setMaximum(runnables.size());
         return CompletableFuture.runAsync(() -> {
             for (Runnable runnable : runnables) {
-                runnable.run();
-                processBar.setValue(++process);
+                try {
+                    runnable.run();
+                    processBar.setValue(++process);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
 
