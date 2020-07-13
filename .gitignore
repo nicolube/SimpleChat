@@ -4,3 +4,4 @@ target
 *.class
 *.pem
 *.bat
+dependency-reduced-pom.xml
