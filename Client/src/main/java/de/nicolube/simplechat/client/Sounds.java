@@ -15,7 +15,7 @@ public class Sounds {
             clip = cacheAudio(path);
         }
         FloatControl control = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-        control.setValue(((control.getMaximum()-control.getMinimum())*(gain/100))+control.getMinimum());
+        control.setValue(((control.getMaximum() - control.getMinimum()) * (gain / 100)) + control.getMinimum());
         clip.stop();
         clip.setFramePosition(0);
         clip.start();
@@ -23,9 +23,10 @@ public class Sounds {
 
     @SneakyThrows
     public static Clip cacheAudio(String path) {
-        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(Sounds.class.getResource(path));
-        DataLine.Info info = new DataLine.Info(Clip.class, audioInputStream.getFormat());
-        Clip clip = (Clip) AudioSystem.getLine(info);
+        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(AudioFormat.Encoding.PCM_SIGNED,
+                AudioSystem.getAudioInputStream(Sounds.class.getResource(path)));
+        Clip clip = AudioSystem.getClip();
+        clip.open(audioInputStream);
         Sounds.audioClips.put(path, clip);
         return clip;
     }
