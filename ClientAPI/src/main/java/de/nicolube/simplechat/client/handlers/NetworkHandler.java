@@ -16,7 +16,7 @@
  */
 package de.nicolube.simplechat.client.handlers;
 
-import de.nicolube.simplechat.client.Client;
+import de.nicolube.simplechat.client.ClientAPI;
 import de.nicolube.simplechat.common.CachedMessage;
 import de.nicolube.simplechat.common.User;
 import de.nicolube.simplechat.packets.*;
@@ -30,9 +30,9 @@ import java.util.LinkedList;
  */
 public class NetworkHandler extends SimpleChannelInboundHandler<Packet> {
 
-    private final Client client;
+    private final ClientAPI client;
 
-    public NetworkHandler(Client client) {
+    public NetworkHandler(ClientAPI client) {
         this.client = client;
     }
 

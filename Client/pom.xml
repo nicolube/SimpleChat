@@ -33,7 +33,7 @@
     <dependencies>
         <dependency>
             <groupId>de.nicolube.simplechat</groupId>
-            <artifactId>Packets</artifactId>
+            <artifactId>ClientAPI</artifactId>
             <version>pre-alpha-0.0.2</version>
             <scope>compile</scope>
         </dependency>

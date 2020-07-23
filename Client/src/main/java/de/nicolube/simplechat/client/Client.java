@@ -43,19 +43,16 @@ import java.util.concurrent.CompletableFuture;
 /**
  * @author nicolue.de
  */
-public class Client {
+public class Client extends ClientAPI {
 
     public static boolean EPPLL = Epoll.isAvailable();
 
-    private final Config config;
     @Getter
     private final MainFrame mainFrame;
-    private MultithreadEventLoopGroup eventLoopGroup;
-    private Channel channel;
     private User user;
 
     public Client() {
-        this.config = new Config();
+        super();
         this.mainFrame = new MainFrame(this);
         this.mainFrame.loginPanel();
         ResourceLoader resourceLoader = new ResourceLoader(this.mainFrame.getLoginPanel().getLoadingBar());
@@ -65,51 +62,18 @@ public class Client {
 
     }
 
-    @SneakyThrows
-    public void initChannel() {
-        Client client = this;
-        this.eventLoopGroup = EPPLL ? new EpollEventLoopGroup() : new NioEventLoopGroup();
-        SslContext sslContext = SslContextBuilder.forClient().trustManager(getClass().getResourceAsStream("/csr.pem")).build();
-        CompletableFuture.runAsync(() -> {
-            try {
-                this.channel = new Bootstrap()
-                        .group(eventLoopGroup)
-                        .channel(EPPLL ? EpollSocketChannel.class : NioSocketChannel.class)
-                        .handler(new ChannelInitializer<Channel>() {
-                            @Override
-                            protected void initChannel(Channel ch) throws Exception {
-                                ch.pipeline()
-                                        .addLast("ssl", sslContext.newHandler(ch.alloc()))
-                                        .addLast(new PacketDecoder())
-                                        .addLast(new PacketEncoder())
-                                        .addLast(new NetworkHandler(client));
-                            }
-                        })
-                        .connect(config.getHost(), config.getPort()).sync().channel();
-                this.channel.closeFuture().syncUninterruptibly();
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                eventLoopGroup.shutdownGracefully();
-            }
-        });
-    }
-
     public static void main(String[] args) {
         new Client();
     }
 
-    public void sendMessage(String message) {
-        PacketInChat packetInChat = new PacketInChat(message);
-        this.channel.pipeline().writeAndFlush(packetInChat);
-    }
-
+    @Override
     public void receiveMessage(User sender, String message) {
         ReceiveType type = ReceiveType.OTHER;
         if (this.user.getUuid().equals(sender.getUuid())) type = ReceiveType.SELF;
         this.mainFrame.getMainPanel().addMessage(sender, message, type);
     }
 
+    @Override
     public void receiveCachedChat(LinkedList<CachedMessage> messages) {
         for (CachedMessage cm : messages) {
             User sender = cm.getUser();
@@ -119,6 +83,7 @@ public class Client {
         }
     }
 
+    @Override
     public void updateUserList(String[] userList) {
         StringBuilder sb = new StringBuilder();
         for (String user : userList) {
@@ -127,23 +92,10 @@ public class Client {
         getMainFrame().getMainPanel().getUserListPane().setText(sb.toString());
     }
 
-    public void prepareLogin(String username) {
-        this.channel.writeAndFlush(new PacketInLogin(username));
-    }
-
+    @Override
     public void login(User user) {
-        System.out.println("login");
         this.mainFrame.mainPanel();
         this.user = user;
-    }
-
-    public void logout() {
-        if (this.channel.isOpen()) {
-            System.out.println("logout");
-            this.channel.disconnect();
-            this.channel.close();
-            this.eventLoopGroup.shutdownGracefully();
-        }
     }
 
 }

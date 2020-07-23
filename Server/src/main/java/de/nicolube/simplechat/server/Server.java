@@ -25,6 +25,7 @@ import de.nicolube.simplechat.server.handlers.NetworkHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
@@ -55,7 +56,6 @@ public class Server {
         this.config = new Config();
         this.users = new HashMap();
         this.cachedMessages = new LinkedList<>();
-        Server server = this;
         EventLoopGroup eventLoopGroup = EPPLL ? new EpollEventLoopGroup() : new NioEventLoopGroup();
         SslContext sslContext = SslContextBuilder.forServer(getClass().getResourceAsStream("/csr.pem"), getClass().getResourceAsStream("/privkey.pem")).build();
         try {
@@ -69,9 +69,11 @@ public class Server {
                                     .addLast("ssl", sslContext.newHandler(ch.alloc()))
                                     .addLast(new PacketEncoder())
                                     .addLast(new PacketDecoder())
-                                    .addLast(new NetworkHandler(server));
+                                    .addLast(new NetworkHandler(Server.this));
                         }
                     })
+                    .childOption(ChannelOption.SO_KEEPALIVE, true)
+                    .option(ChannelOption.SO_BACKLOG, 50)
                     .bind(config.getHost(), config.getPort()).sync().channel().closeFuture().syncUninterruptibly();
         } finally {
             eventLoopGroup.shutdownGracefully();
